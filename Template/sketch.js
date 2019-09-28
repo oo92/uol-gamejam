@@ -8,7 +8,7 @@ https://freesound.org/
 
 */
 
-
+var projectiles = [];
 
 var jumpSound;
 
@@ -41,6 +41,23 @@ function setup()
 function keyPressed()
 {
     jumpSound.play();
+    
+    
+    if(keyCode == 32)
+    {
+        projectiles.push(new Projectile(random(10,100), random(10,100)));
+    }
+
+}
+
+function draw()
+{
+    background(255);
+    
+    for(var i = 0; i < projectiles.length; i++)
+    {
+        projectiles[i].drawProjectile();
+    }
 }
 
 //the move function it uses the arrows
@@ -66,3 +83,17 @@ function move(){
     }
     
   }
+
+function Projectile(shipX, shipY)
+{
+    this.shipX = shipX;
+    this.shipY = shipY;
+    this.drawProjectile = function()
+    {
+        rect(this.shipX, this.shipY, 10, 10);
+        this.shipX +=  1;
+        
+    }
+}
+
+
