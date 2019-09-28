@@ -1,5 +1,6 @@
 var projectiles = [];
 
+// Player object and sprite
 var player =  {x: 0, y: 0, rotation: 0, dy: 0, dx: 0};
 var playerSprite
 
@@ -10,18 +11,19 @@ var scrollPos = {x: 0, y: 0};
 
 function preload()
 {
+    // Load player sprite from file
     playerSprite = loadImage('assets/ship.png');
 }
 
 function setup()
 {
+    // Create canvas
     createCanvas(windowWidth - 50, windowHeight - 50);
     startGame();
 }
  
 function keyPressed()
 {
-    
     if(keyCode == 32)
     {
         projectiles.push(new Projectile(player.x + player.dx, player.y + player.dy, player.rotation));
@@ -35,6 +37,7 @@ function draw()
     
     // Push scrolling background
     push();
+    // Scroll background
     translate(scrollPos.x, scrollPos.y);
     
     for(var i = 0; i < projectiles.length; i++)
@@ -58,8 +61,10 @@ function draw()
     image(playerSprite, 0, 0, 17 * 2, 64 * 2)
     pop();
     
+    // Player input
     shipSteerControls();
 
+    // Update scrollPos
     scrollBackground();
     
     // Updates real position of gameChar for collision detection.
@@ -73,10 +78,9 @@ function draw()
     ellipse(750,480, 100, 100);
     ellipse(1250,580, 100, 100);
     ////////////////////////////
-    
-    pop();
+
     // Pop background scrolling
-    //
+    pop();
 }
 
 function Projectile(shipX, shipY, shipAng)
@@ -93,9 +97,13 @@ function Projectile(shipX, shipY, shipAng)
     }
 }
 
+// Player input
+// Left and Right rotate ship
+// Up moves player forward
+// TODO: Change forward to increment acceleration rather than move forward at constant velocity
 function shipSteerControls()
 {
-    // TODO: Change forward to increment acceleration rather than move forward at constant velocity
+    
     if (keyIsDown(LEFT_ARROW))
     {
         player.rotation -= 0.02;
@@ -111,6 +119,7 @@ function shipSteerControls()
     }
 }
 
+// Set up everything at the beginning of the game
 function startGame()
 {
     player.x = width/2;
@@ -120,6 +129,7 @@ function startGame()
     player_world.y = player_world.y - scrollPos.y;
 }
 
+// Update scrollPos position
 function scrollBackground()
 {
     if (keyIsDown(UP_ARROW))
