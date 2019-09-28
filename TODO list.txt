@@ -1,0 +1,7 @@
+To-Do List
+-Ship steering mechanics
+-Spawn enemies (maybe offscreen), need constructor functions for spawning ships
+-Draw a ship and a map
+-Cannon firing mechanics and reload time
+-Music sound?
+ 
