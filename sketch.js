@@ -1,3 +1,12 @@
+var cor={
+    x:50,
+    y:50
+    
+  };
+  
+  var speed=3;
+
+
 function setup()
 {
 	createCanvas(windowWidth, windowHeight);
