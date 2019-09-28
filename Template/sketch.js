@@ -40,7 +40,13 @@ function setup()
  
 function keyPressed()
 {
-    jumpSound.play();
+    //jumpSound.play();
+}
+
+function draw() {
+background(220);
+rect(cor.x,cor.y,50,50);
+  move();
 }
 
 //the move function it uses the arrows
