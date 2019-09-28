@@ -21,16 +21,9 @@ var cor={
 };
 
 
-var speed=0.2;
+var speed=3;
 
-function preload()
-{
-    soundFormats('mp3','wav');
-    
-    //load your sounds here
-    jumpSound = loadSound('assets/jump.wav');
-    jumpSound.setVolume(0.1);
-}
+
 
 
 function setup()
@@ -40,10 +33,7 @@ function setup()
 }
 
  
-function keyPressed()
-{
-    //jumpSound.play();
-}
+
 
 function draw() {
   background(220);
@@ -66,32 +56,32 @@ function draw() {
 function move(){
   if(keyIsDown(LEFT_ARROW))
   {
-    cor.x=cor.x-speed*deltaTime;
+    cor.x=cor.x-speed;
   }
   
   if(keyIsDown(RIGHT_ARROW))
   {
-    cor.x=cor.x+speed*deltaTime;
+    cor.x=cor.x+speed;
   }
   
   if(keyIsDown(UP_ARROW))
   {
-    cor.y=cor.y-speed*deltaTime;
+    cor.y=cor.y-speed;
   }
   
   if(keyIsDown(DOWN_ARROW))
   {
-    cor.y=cor.y+speed*deltaTime;
+    cor.y=cor.y+speed;
   }
   
   if(keyIsDown(82))
      {
-      cor.z=cor.z+1;
+      cor.z=cor.z+0.1;
      }
   
   if(keyIsDown(81))
   {
-    cor.z=cor.z-1;
+    cor.z=cor.z-0.1;
   }
     
   }
