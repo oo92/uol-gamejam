@@ -37,7 +37,7 @@ function setup()
 
 }
 
-
+ 
 function keyPressed()
 {
     jumpSound.play();
@@ -62,7 +62,7 @@ function move(){
     
     if(keyIsDown(DOWN_ARROW))
     {
-      cor.y=cor.y+speed;
+      cor.y=cor.y+speed; 
     }
     
   }
