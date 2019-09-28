@@ -44,9 +44,12 @@ function keyPressed()
 }
 
 function draw() {
-background(220);
-rect(cor.x,cor.y,50,50);
-  move();
+    background(220);
+    rectMode(CENTER);
+    cor.x=map(cor.x,0,width,0,width,true);
+    cor.y=map(cor.y,0,height,0,height,true);
+    rect(cor.x,cor.y,50,50);
+    move();
 }
 
 //the move function it uses the arrows
