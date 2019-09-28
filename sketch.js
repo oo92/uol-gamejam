@@ -1,7 +1,12 @@
 var projectiles = [];
 
-var player =  {x: 500, y: 500, rotation: 0, dy: 0, dx: 0};
+var player =  {x: 0, y: 0, rotation: 0, dy: 0, dx: 0};
 var playerSprite
+
+// Player's real position in the world
+var player_world = {x: 0, y: 0};
+// Background scroll position
+var scrollPos = {x: 0, y: 0};
 
 function preload()
 {
@@ -11,6 +16,7 @@ function preload()
 function setup()
 {
     createCanvas(windowWidth - 50, windowHeight - 50);
+    startGame();
 }
  
 function keyPressed()
@@ -23,9 +29,13 @@ function keyPressed()
 }
 
 function draw()
-{
+{   
     clear();
     background(120,200,200);
+    
+    // Push scrolling background
+    push();
+    translate(scrollPos.x, scrollPos.y);
     
     for(var i = 0; i < projectiles.length; i++)
     {
@@ -38,15 +48,35 @@ function draw()
         }
     }
     
+    
+    // Draw player
     push();
-    translate(player.x + player.dx, player.y + player.dy)
+    translate(player.x, player.y)
     rotate(player.rotation);
     noSmooth();
     imageMode(CENTER);
     image(playerSprite, 0, 0, 17 * 2, 64 * 2)
-    //ellipse(0, 0, 50, 180);
-    shipSteerControls();
     pop();
+    
+    shipSteerControls();
+
+    scrollBackground();
+    
+    // Updates real position of gameChar for collision detection.
+	player_world.x = player.x - scrollPos.x;
+    player_world.y = player.y - scrollPos.y;
+    
+    ////////////////////////////
+    // Dummy world props
+    ellipse(150,280, 100, 100);
+    ellipse(950,180, 100, 100);
+    ellipse(750,480, 100, 100);
+    ellipse(1250,580, 100, 100);
+    ////////////////////////////
+    
+    pop();
+    // Pop background scrolling
+    //
 }
 
 function Projectile(shipX, shipY, shipAng)
@@ -76,7 +106,31 @@ function shipSteerControls()
     }
     if (keyIsDown(UP_ARROW))
     {
-        player.dx += sin(player.rotation);
-        player.dy -= cos(player.rotation);
+        player.x += sin(player.rotation);
+        player.y -= cos(player.rotation);
     }
+}
+
+function startGame()
+{
+    player.x = width/2;
+    player.y = height/2;
+    
+    player_world.x = player_world.x - scrollPos.x;
+    player_world.y = player_world.y - scrollPos.y;
+}
+
+function scrollBackground()
+{
+    if (keyIsDown(UP_ARROW))
+    {
+        scrollPos.x -= sin(player.rotation) * 1;
+        scrollPos.y += cos(player.rotation) * 1;
+    }
+}
+
+// TODO: Create function to smoothly follow player
+function cameraSmooth()
+{
+    pass;
 }
