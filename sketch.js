@@ -9,6 +9,12 @@ var player_world = {x: 0, y: 0};
 // Background scroll position
 var scrollPos = {x: 0, y: 0};
 
+//Powerups
+var moveSpeed=1;
+var rotationSpeed=0.02;
+var projectileSpeed=1;
+var powerBool=true;
+
 function preload()
 {
     // Load player sprite from file
@@ -34,6 +40,8 @@ function draw()
 {   
     clear();
     background(120,200,200);
+
+    
     
     // Push scrolling background
     push();
@@ -60,6 +68,25 @@ function draw()
     imageMode(CENTER);
     image(playerSprite, 0, 0, 17 * 2, 64 * 2)
     pop();
+
+    //powerups it provides two options and you can choose one and the other disappears
+    powerup=new powerUps(500,600,600,500);
+    if(powerBool)
+    {
+        powerup.moveUp();
+        powerup.projectileUp();
+        
+    }
+    if(dist(powerup.moveX,powerup.moveY,player.x + player.dx,player.y + player.dy)<40)
+    {
+        moveSpeed=4;
+        powerBool=false;
+    }
+    if(dist(powerup.projX,powerup.projY,player.x + player.dx,player.y + player.dy)<40)
+    {
+        projectileSpeed=3;
+        powerBool=false;
+    }
     
     // Player input
     shipSteerControls();
@@ -92,8 +119,8 @@ function Projectile(shipX, shipY, shipAng)
     {
         fill(255);
         rect(this.shipX, this.shipY, 10, 10);
-        this.shipX +=  cos(this.projAng);
-        this.shipY += sin(this.projAng);
+        this.shipX +=  cos(this.projAng)*projectileSpeed;
+        this.shipY += sin(this.projAng)*projectileSpeed;
     }
 }
 
@@ -106,16 +133,16 @@ function shipSteerControls()
     
     if (keyIsDown(LEFT_ARROW))
     {
-        player.rotation -= 0.02;
+        player.rotation -= 0.02*moveSpeed;
     }
     if (keyIsDown(RIGHT_ARROW))
     {
-        player.rotation += 0.02;
+        player.rotation += 0.02*moveSpeed;
     }
     if (keyIsDown(UP_ARROW))
     {
-        player.x += sin(player.rotation);
-        player.y -= cos(player.rotation);
+        player.x += sin(player.rotation)*moveSpeed;
+        player.y -= cos(player.rotation)*moveSpeed;
     }
 }
 
@@ -134,8 +161,8 @@ function scrollBackground()
 {
     if (keyIsDown(UP_ARROW))
     {
-        scrollPos.x -= sin(player.rotation) * 1;
-        scrollPos.y += cos(player.rotation) * 1;
+        scrollPos.x -= sin(player.rotation) * moveSpeed;
+        scrollPos.y += cos(player.rotation) * moveSpeed;
     }
 }
 
@@ -143,4 +170,28 @@ function scrollBackground()
 function cameraSmooth()
 {
     pass;
+}
+
+function powerUps(moveX,moveY,projX,projY)
+{
+    this.moveX=moveX;
+    this.moveY=moveY;
+    this.projX=projX;
+    this.projY=projY;
+
+    this.moveUp =function()
+    {
+        push();
+        fill('blue');
+        rect(this.moveX,this.moveY,20,20);
+        pop();
+    }
+
+    this.projectileUp=function()
+    {
+        push();
+        fill('red');
+        ellipse(projX,projY,20,20);
+        pop();
+    }
 }
