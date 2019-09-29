@@ -1,8 +1,11 @@
 var projectiles = [];
+var enemyProjectiles = [];
 
 // Player object and sprite
-var player =  {x: 0, y: 0, rotation: 0, dy: 0, dx: 0};
+var player =  {x: 500, y: 500, rotation: 0, dy: 0, dx: 0, projRange: 200, maxRange: 400, minRange: 30, hitBoxWidth: 50, hitBoxHeight: 180};
 var playerSprite
+
+var testEnemy = {x: 200, y:200, radius: 100};
 
 // Player's real position in the world
 var player_world = {x: 0, y: 0};
@@ -31,12 +34,18 @@ function setup()
     createCanvas(windowWidth - 50, windowHeight - 50);
     startGame();
 }
- 
+
 function keyPressed()
 {
+    //If space is pressed instatiate a new projectile
     if(keyCode == 32)
     {
         projectiles.push(new Projectile(player.x + player.dx, player.y + player.dy, player.rotation));
+    }
+    
+    if(keyCode == 71)
+    {
+        enemyProjectiles.push(new Projectile(100, 400, PI));
     }
 }
 
@@ -55,14 +64,45 @@ function draw()
     for(var i = 0; i < projectiles.length; i++)
     {
         projectiles[i].drawProjectile();
+        //Increments the projectiles time in flight
+        projectiles[i].projTime += 1;    
         
-        if(projectiles[i].shipX < 0 || projectiles[i].shipX > width || projectiles[i].shipY < 0 || projectiles[i].shipY > height)
+        //If the projectiles time of flight is > than its lifetime or, the projectile has lef the bounds of the screen, remove the projectile from the array
+        if(projectiles[i].projTime > projectiles[i].lifetime || projectiles[i].shipX < 0 || projectiles[i].shipX > width || projectiles[i].shipY < 0 || projectiles[i].shipY > height)
         {
             projectiles.splice(i,1);
             i--;
         }
+        //If the projectile is within the distance threshold of the enemy and the endpoint of the projectile is within the threshold distance of the enemy remove the projectile
+        else if(dist(testEnemy.x, testEnemy.y, projectiles[i].shipX, projectiles[i].shipY) < 50 && dist(testEnemy.x, testEnemy.y, projectiles[i].projEndPointX, projectiles[i].projEndPointY) < 50)
+        {
+            projectiles.splice(i,1);
+            i--;  
+        }
     }
-    
+
+    for(var i = 0; i < enemyProjectiles.length; i++)
+    {
+        enemyProjectiles[i].drawProjectile();
+        push();
+        rotate(player.rotation);
+        
+        if(enemyProjectiles[i].shipX < 0 || enemyProjectiles[i].shipX > width || enemyProjectiles[i].shipY < 0 || enemyProjectiles[i].shipY > height)
+        {
+            enemyProjectiles.splice(i,1);
+            i--;
+        }
+       // else if(abs(enemyProjectiles[i].shipX - player.x - player.dx) < player.hitBoxWidth/2 * sin(player.rotation)&& abs(enemyProjectiles[i].shipY - player.y - player.dy) < player.hitBoxHeight/2 )
+        else if(abs(player.x + player.dx - (sin(player.rotation) * player.hitBoxHeight) - enemyProjectiles[i].shipX) < player.hitBoxWidth/2 * cos(player.rotation) + player.hitBoxHeight * sin(player.rotation)
+               )
+        {
+            enemyProjectiles.splice(i,1);
+            i--;  
+        }
+        
+        pop();
+    }
+
     
     // Draw player
     push();
@@ -71,8 +111,25 @@ function draw()
     noSmooth();
     imageMode(CENTER);
     image(playerSprite, 0, 0, 17 * 2, 64 * 2);
+    //Draw player hitbox - delete later
+    noFill();
+    stroke(255,0,0);
+    rect(-player.hitBoxWidth/2,-player.hitBoxHeight/2,player.hitBoxWidth,player.hitBoxHeight);
+    //
     pop();
+    
+    //Draws the line representing the path of the projectile
+    drawProjectilePath();
 
+    //draws a test enemy
+    push();
+    fill(255);
+    ellipse(testEnemy.x, testEnemy.y, 5);
+    noFill();
+    stroke(255);
+    ellipse(testEnemy.x, testEnemy.y, testEnemy.radius);
+    pop();
+    
     //powerups it provides two options and you can choose one and the other disappears
     powerup=new powerUps(500,600,600,500);
     if(powerBool)
@@ -114,17 +171,37 @@ function draw()
     pop();
 }
 
+//Constructor function for creating new projectiles
 function Projectile(shipX, shipY, shipAng)
 {
+    //the x and y spawning point of the projectile
     this.shipX = shipX;
     this.shipY = shipY;
+    //speed of projectile
+    this.projSpeed = 5;
+    //angle of projectile (90 degrees) to the ship
     this.projAng = shipAng + PI;
+    //The X and Y positions of where the projectile lands
+    this.projEndPointX = (player.x + player.dx) + player.projRange * cos(player.rotation + PI);
+    this.projEndPointY = (player.y + player.dy) + player.projRange * sin(player.rotation + PI);
+    //Distance the projectile travels (distance between ship and endpoint)
+    this.projDist = dist(player.x + player.dx,
+                         player.y + player.dy,
+                         this.projEndPointX,
+                         this.projEndPointY
+                        );
+    //Initial time projectile has been in flight
+    this.projTime = 0;
+    //The max time the projectile will fly before being removed
+    this.lifetime = this.projDist / this.projSpeed;
+    //Draws and updates the position of the projectile
     this.drawProjectile = function()
     {
         fill(255);
-        rect(this.shipX, this.shipY, 10, 10);
-        this.shipX +=  cos(this.projAng)*projectileSpeed;
-        this.shipY += sin(this.projAng)*projectileSpeed;
+        ellipse(this.shipX, this.shipY,10);
+        //increments x and y by the angle of the projectile so it continues on correct path
+        this.shipX +=  cos(this.projAng) * this.projSpeed;
+        this.shipY += sin(this.projAng) * this.projSpeed;
     }
 }
 
@@ -199,5 +276,35 @@ function powerUps(moveX,moveY,projX,projY)
         imageMode(CENTER);
         image(shotUpSprite, this.projX, this.projY, 13 * 2, 13 * 2)
         pop();
+    }
+}
+
+//Draws a line represtning the projectiles path
+function drawProjectilePath()
+{
+    push();
+    stroke(255,0,0);
+    strokeWeight(3);
+    //The endpoint of the range for x and y
+    var endRangeX = (player.x + player.dx) + player.projRange * cos(player.rotation + PI);
+    var endRangeY = (player.y + player.dy) + player.projRange * sin(player.rotation + PI);
+    
+    line(player.x + player.dx,
+         player.y + player.dy,
+         endRangeX,
+         endRangeY);
+    pop();
+    
+    //If Q or E is pressed and the distance between ship and endpoint is less/greater than the maxRange/minRange then increment/decrement range
+    if(keyIsDown(81) && dist(player.x + player.dx, player.y + player.dy, endRangeX, endRangeY) < player.maxRange)
+    {
+    
+        player.projRange += 1;
+        
+    }
+    
+    if(keyIsDown(69) && dist(player.x + player.dx, player.y + player.dy, endRangeX, endRangeY) > player.minRange)
+    {
+        player.projRange -= 1;
     }
 }
