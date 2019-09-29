@@ -14,11 +14,15 @@ var moveSpeed=1;
 var rotationSpeed=0.02;
 var projectileSpeed=1;
 var powerBool=true;
+var speedUpSprite;
+var shotUpSprite;
 
 function preload()
 {
     // Load player sprite from file
     playerSprite = loadImage('assets/ship.png');
+    shotUpSprite = loadImage('assets/shotsup.png');
+    speedUpSprite = loadImage('assets/speedup.png');
 }
 
 function setup()
@@ -66,7 +70,7 @@ function draw()
     rotate(player.rotation);
     noSmooth();
     imageMode(CENTER);
-    image(playerSprite, 0, 0, 17 * 2, 64 * 2)
+    image(playerSprite, 0, 0, 17 * 2, 64 * 2);
     pop();
 
     //powerups it provides two options and you can choose one and the other disappears
@@ -182,16 +186,18 @@ function powerUps(moveX,moveY,projX,projY)
     this.moveUp =function()
     {
         push();
-        fill('blue');
-        rect(this.moveX,this.moveY,20,20);
+        noSmooth();
+        imageMode(CENTER);
+        image(speedUpSprite, this.moveX, this.moveY, 13 * 2, 16 * 2)
         pop();
     }
 
     this.projectileUp=function()
     {
         push();
-        fill('red');
-        ellipse(projX,projY,20,20);
+        noSmooth();
+        imageMode(CENTER);
+        image(shotUpSprite, this.projX, this.projY, 13 * 2, 13 * 2)
         pop();
     }
 }
